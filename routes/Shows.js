@@ -9,7 +9,12 @@ const cache = require('../cache/cache');
 const Agenda = require('agenda');
 const nodemailer = require('nodemailer');
 require('dotenv/config');
-const agenda = new Agenda({ db: { address: process.env.DB_CONNECTION, options: { useNewUrlParser: true } } });
+const agenda = new Agenda({
+  db: {
+    address: 'mongodb+srv://Tatsiana:1234@cluster0-ksmii.mongodb.net/test?retryWrites=true&w=majority',
+    options: { useNewUrlParser: true }
+  }
+});
 
 agenda.define('send email alert',{priority: 'high', concurrency: 10}, async (job, done) => {
   let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
