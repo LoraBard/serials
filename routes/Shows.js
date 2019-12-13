@@ -1,3 +1,4 @@
+require('dotenv/config');
 const express = require('express');
 const router = express.Router();
 const request = require('request');
@@ -8,10 +9,9 @@ const path = require('path');
 const cache = require('../cache/cache');
 const Agenda = require('agenda');
 const nodemailer = require('nodemailer');
-require('dotenv/config');
 const agenda = new Agenda({
   db: {
-    address: 'mongodb+srv://Tatsiana:1234@cluster0-ksmii.mongodb.net/test?retryWrites=true&w=majority',
+    address: `${process.env.DB_CONNECTION}`,
     options: { useNewUrlParser: true }
   }
 });

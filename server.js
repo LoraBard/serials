@@ -34,7 +34,7 @@ app.listen(port, () => {
   console.log('app running on', port);
 });
 
-mongoose.connect('mongodb+srv://Tatsiana:1234@cluster0-ksmii.mongodb.net/test?retryWrites=true&w=majority',{ useNewUrlParser: true },()=>{
+mongoose.connect(`${process.env.DB_CONNECTION}`,{ useNewUrlParser: true },()=>{
 })
 
 module.exports = app;
