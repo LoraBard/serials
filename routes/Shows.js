@@ -11,7 +11,7 @@ const Agenda = require('agenda');
 const nodemailer = require('nodemailer');
 const agenda = new Agenda({
   db: {
-    address: `${process.env.DB_CONNECTION}`,
+    address: process.env.DB_CONNECTION,
     options: { useNewUrlParser: true }
   }
 });

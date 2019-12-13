@@ -34,7 +34,7 @@ app.listen(port, () => {
   console.log('app running on', port);
 });
 
-mongoose.connect(`${process.env.DB_CONNECTION}`,{ useNewUrlParser: true },()=>{
+mongoose.connect(process.env.DB_CONNECTION,{ useNewUrlParser: true },()=>{
 })
 
 module.exports = app;
