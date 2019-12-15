@@ -198,8 +198,8 @@ router.post('/shows', async function(req, res, next) {
           return res.send(404, { message: req.body.showName + ' was not found.' });
     }
     const AllShows = resp;
-    const length = AllShows.length;
-
+    let length = 0;
+    console.log('RESPONSE', resp);
     AllShows.map(async (show) => {
       request.get(`https://api.thetvdb.com/series/${show.id}`,{
         headers: {
@@ -208,6 +208,8 @@ router.post('/shows', async function(req, res, next) {
       }, async (error, response, body) => {
         if (error) return next(error);
           let series = await JSON.parse(body).data;
+          if(show.status == "Ended" || show.status == "" || show.poster == "" || show.overview == null) return;
+          length+=1;
           show = new Show({
             _id: show.id,
             name: series.seriesName,
