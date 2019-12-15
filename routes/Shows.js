@@ -76,12 +76,12 @@ router.post('/subscribe',(req, res, next) => {
     if (err) return next(err);
     show.subscribers.push(req.body.user);
     show.save();
-    res.send(true);
   });
   User.findOne({email:req.body.user},(err,user)=> {
     if (err) return next(err);
     user.shows.push(req.body.showId);
     user.save();
+    res.send(true);
   });
 });
 
@@ -101,55 +101,33 @@ router.post('/unsubscribe', (req, res, next)=>{
   });
 });
 
-router.get('/shows/:id',cache.get, (req, res, next) => {
+router.get('/shows/:id', (req, res, next) => {
   if(res.body) res.send(res.body);
 
   Show.findById(req.params.id, (err, show) => {
     if (err) return next(err);
-    cache.set(req,show,next);
     res.send(show);
   });
 });
 
 
 router.get('/userShows', async (req,res, next) => {
-  console.log('USER_SHOWS');
-  console.log('USER_SHOWS_REQUEST', req.query.user);
-  let userShows = [];
-  let arr = [];
   if (req.query.user) {
 
-    User.aggregate([
-        {
-          $lookUp:
-          {
-            from:"shows",
-            localField: "shows",
-            foreignField: "_id",
-            as: "serials"
-          }
-        }
-      ]).exec((err,res)=>{
-        console.log('LALALLA',JSON.stringify(res));
-      });
+    if (req.query.user) {
+
+      const showsArr = User.find({email: req.query.user});
+      showsArr.then((resp,rej) =>{
+          res.send(resp[0].shows);
+        });
+      }
     }
-      // console.log('USER_SHOWS_VARIABLE', userShows);
-      // userShows.map( async showId => {
-      //   return Show.findById(showId, (err, show) => {
-      //     // if (err) return next(err);
-      //     arr.push(show);
-      //   });
-      // });
-      // // const sended = await res.send(arr);
-      // // console.log('SENDED',sended);
-      // res.send(arr);
 });
 
 router.get('/shows', cache.get, async (req, res, next) => {
   console.log('RESPONSE',res);
 
   if(res.body) {
-    console.log('send');
     res.send(res.body);
   }
 
@@ -158,26 +136,26 @@ router.get('/shows', cache.get, async (req, res, next) => {
       if (err) return next(err);
       cache.set(req,show,next);
       res.send(show);
-    }).limit(40);
+    }).limit(100);
   } else if (req.query.alphabet) {
     await Show.find({ name: new RegExp('^' + '[' + req.query.alphabet + ']', 'i') },(err,show)=>{
       if (err) return next(err);
       cache.set(req,show,next);
       res.send(show);
-    }).limit(40);
+    }).limit(100);
   }
     else if(req.query.day) {
       await Show.find({ airsDayOfWeek: new RegExp('^' + '[' + req.query.day + ']', 'i') }, async (err,show)=>{
         if (err) return next(err);
         cache.set(req,show,next);
         res.send(show);
-      }).limit(40);
+      }).limit(100);
   } else {
     Show.find(null,(err,show)=>{
       if (err) return next(err);
       cache.set(req,show,next);
       res.send(show);
-    }).limit(40);
+    }).limit(100);
   }
 });
 
@@ -220,7 +198,8 @@ router.post('/shows', async function(req, res, next) {
           return res.send(404, { message: req.body.showName + ' was not found.' });
     }
     const AllShows = resp;
-    console.log('RESPONSE', resp);
+    const length = AllShows.length;
+
     AllShows.map(async (show) => {
       request.get(`https://api.thetvdb.com/series/${show.id}`,{
         headers: {
@@ -262,6 +241,7 @@ router.post('/shows', async function(req, res, next) {
               });
           });
           await show.save();
+          res.send(length.toString());
         }
         );
       });

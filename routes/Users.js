@@ -2,21 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
-router.post('/google',(req,res,next)=>{
-  const profile = req.body.profile;
-  User.findOne({ google: profile.id }, function(err, existingUser) {
-    if (existingUser) {
-      console.log('user exists');
-      return;
-    }
-    const user = new User({
-        email: profile.email,
-        password:''
-    });
-    console.log('USER',user);
-    user.save();
-  });
-});
 
 router.post('/signup', function(req, res, next) {
   console.log('UUUUSER',req.body);
@@ -25,6 +10,7 @@ router.post('/signup', function(req, res, next) {
     password: req.body.password
   });
   user.save();
+  res.send({ available: user });
 });
 
 router.post('/login', function(req, res, next) {
@@ -35,20 +21,8 @@ router.post('/login', function(req, res, next) {
   });
 });
 
-router.get('/users', function(req, res, next) {
-  if (!req.query.email) {
-    return res.send(400, { message: 'Email parameter is required.' });
-  }
 
-  User.findOne({ email: req.query.email }, function(err, user) {
-    if (err) return next(err);
-    res.send({ available: !user });
-  });
-});
-
-/* GET users listing. */
 router.get('*', (req, res) => {
-  console.log('NOTnoooooooo');
   res.sendFile(path.join(__dirname, '../dist/browser/index.html'));
 });
 
